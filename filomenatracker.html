@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nail Equipments by Jo</title>
+    <!-- Clean Bubbly Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --rose-quartz: #F9CBD6;
+            --blush: #F2AFBC;
+            --red-wine: #9E182B;
+            --oat-milk: #F2E0D2;
+            --white: #ffffff;
+        }
+
+        @keyframes fadeInSlide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--blush);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--red-wine);
+        }
+
+        .container {
+            background: var(--oat-milk);
+            padding: 2rem;
+            border-radius: 35px;
+            box-shadow: 8px 8px 0px var(--red-wine);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            border: 4px solid var(--red-wine);
+            animation: fadeInSlide 0.4s ease-out;
+        }
+
+        h1 { 
+            color: var(--red-wine); 
+            font-size: 2rem; 
+            margin-bottom: 20px; 
+            font-weight: 700;
+        }
+        
+        h2 { font-size: 1.5rem; margin-top: 0; }
+
+        p { font-size: 1rem; margin-top: -10px; margin-bottom: 20px; }
+
+        .hidden { display: none !important; }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            background-color: var(--red-wine);
+            color: var(--white);
+            border: 3px solid var(--red-wine);
+            padding: 14px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            width: 100%;
+            display: block;
+        }
+
+        button:hover { 
+            background-color: var(--rose-quartz); 
+            color: var(--red-wine);
+            transform: translateY(-2px);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 3px solid var(--red-wine);
+            border-radius: 15px;
+            background: var(--white);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            color: var(--red-wine);
+        }
+
+        .order-card {
+            border: 3px solid var(--red-wine);
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 25px;
+            text-align: left;
+            background: var(--rose-quartz);
+            box-shadow: 4px 4px 0px var(--red-wine);
+        }
+
+        .order-card img {
+            width: 100%;
+            border: 3px solid var(--red-wine);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .copy-btn {
+            background: var(--red-wine);
+            color: var(--white);
+            font-size: 0.9rem;
+            padding: 8px 15px;
+            width: auto;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .back-btn { 
+            background-color: var(--white); 
+            color: var(--red-wine); 
+            margin-top: 20px; 
+            border: 3px solid var(--red-wine);
+            font-size: 1rem;
+        }
+
+        .item-input-group {
+            border: 3px dashed var(--red-wine);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            text-align: left;
+        }
+
+        .timestamp { font-size: 0.8rem; font-weight: 700; margin-top: 8px; display: block; opacity: 0.8; }
+
+        /* Mobile Specific Adjustments */
+        @media (max-width: 400px) {
+            .container { padding: 1.5rem; border-radius: 25px; }
+            h1 { font-size: 1.7rem; }
+            button { padding: 12px 20px; font-size: 1rem; }
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: rotate 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Home Screen 🏠 -->
+    <div id="home-screen" class="container">
+        <h1>Nail Equipments by Jo</h1>
+        <p>Order Tracking System ✨</p>
+        <div class="btn-group">
+            <button onclick="showPage('status-page')">🔍 Check My Status</button>
+            <button onclick="showPage('admin-login')">👑 Admin Access</button>
+        </div>
+    </div>
+
+    <!-- Admin Login 🔐 -->
+    <div id="admin-login" class="container hidden">
+        <h2>Admin Login</h2>
+        <input type="password" id="admin-pass" placeholder="Enter Password">
+        <button onclick="checkAdminPass()">Login ✨</button>
+        <button class="back-btn" onclick="showPage('home-screen')">🔙 Back Home</button>
+    </div>
+
+    <!-- Admin Panel 🛠️ -->
+    <div id="admin-panel" class="container hidden">
+        <h2>Admin Dashboard</h2>
+        <input type="text" id="cust-name" placeholder="👤 Customer Name">
+        
+        <div id="items-container">
+            <div class="item-input-group">
+                <label style="font-size: 0.9rem; font-weight: 700;">📸 Upload Photo:</label>
+                <input type="file" class="order-pic" accept="image/*">
+                <input type="text" class="order-num" placeholder="📦 Order Number">
+                <textarea class="order-details" placeholder="📝 Details/Notes..."></textarea>
+            </div>
+        </div>
+        
+        <button onclick="addItemRow()" style="background: var(--rose-quartz); color: var(--red-wine); margin-bottom: 5px;">➕ Add Another Item</button>
+        <button onclick="submitOrders()" id="submit-btn">✅ Submit All Orders</button>
+        <button class="back-btn" onclick="showPage('home-screen')">🔙 Cancel</button>
+    </div>
+
+    <!-- Status Page 📦 -->
+    <div id="status-page" class="container hidden">
+        <h2>Order Tracking</h2>
+        <input type="text" id="search-name" placeholder="Type Your Name Here...">
+        <button onclick="searchOrders()" id="search-btn">🔍 Search Orders</button>
+        <div id="results-container"></div>
+        <button class="back-btn" onclick="showPage('home-screen')">🔙 Back Home</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVFrH38t3p56D8pro4OZd_w_3CYRZjDpE",
+            authDomain: "jotracker-41311.firebaseapp.com",
+            projectId: "jotracker-41311",
+            storageBucket: "jotracker-41311.firebasestorage.app",
+            messagingSenderId: "723567126382",
+            appId: "1:723567126382:web:0e09135855dc3fc25a437f"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const img = new Image();
+                    img.src = reader.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600; 
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                    };
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.container').forEach(div => div.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function checkAdminPass() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === "filomenasy143") {
+                showPage('admin-panel');
+            } else {
+                alert("Incorrect Password! ❌");
+            }
+        }
+
+        function addItemRow() {
+            const div = document.createElement('div');
+            div.className = 'item-input-group';
+            div.innerHTML = `
+                <label style="font-size: 0.9rem; font-weight: 700;">📸 Upload Photo:</label>
+                <input type="file" class="order-pic" accept="image/*">
+                <input type="text" class="order-num" placeholder="📦 Order Number">
+                <textarea class="order-details" placeholder="📝 Details/Notes..."></textarea>
+            `;
+            document.getElementById('items-container').appendChild(div);
+        }
+
+        async function submitOrders() {
+            const name = document.getElementById('cust-name').value;
+            const submitBtn = document.getElementById('submit-btn');
+            const groups = document.querySelectorAll('.item-input-group');
+
+            if (!name) return alert("Please enter a customer name!");
+
+            submitBtn.innerHTML = '<span class="loader"></span> Saving...';
+            submitBtn.disabled = true;
+
+            try {
+                for (let group of groups) {
+                    const file = group.querySelector('.order-pic').files[0];
+                    const orderNum = group.querySelector('.order-num').value;
+                    const details = group.querySelector('.order-details').value;
+
+                    if (file && orderNum) {
+                        const base64Image = await getBase64(file);
+                        await db.collection("orders").add({
+                            customerName: name.toLowerCase().trim(),
+                            orderNumber: orderNum,
+                            details: details,
+                            imageUrl: base64Image,
+                            uploadedAt: "February 18, 2026", 
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                }
+                submitBtn.innerHTML = '🎉 Success!';
+                setTimeout(() => location.reload(), 1500);
+            } catch (error) {
+                console.error(error);
+                alert("Error! Photo might be too large.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "✅ Submit All Orders";
+            }
+        }
+
+        async function searchOrders() {
+            const nameInput = document.getElementById('search-name');
+            const name = nameInput.value.toLowerCase().trim();
+            const searchBtn = document.getElementById('search-btn');
+            const resultsDiv = document.getElementById('results-container');
+            
+            if (!name) return;
+
+            searchBtn.innerHTML = '<span class="loader"></span> Searching...';
+            searchBtn.disabled = true;
+            resultsDiv.innerHTML = "";
+
+            try {
+                const snapshot = await db.collection("orders")
+                    .where("customerName", "==", name)
+                    .orderBy("timestamp", "desc")
+                    .get();
+
+                searchBtn.innerHTML = "🔍 Search Orders";
+                searchBtn.disabled = false;
+
+                if (snapshot.empty) {
+                    resultsDiv.innerHTML = `<p style="margin-top:20px;">No records found for "<strong>${nameInput.value}</strong>".</p>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                        <img src="${data.imageUrl}" alt="Order">
+                        <strong>📦 Order: ${data.orderNumber}</strong>
+                        <button class="copy-btn" onclick="copyText('${data.orderNumber}')">📋 Copy #</button>
+                        <p style="margin:10px 0; font-size: 0.95rem;">${data.details}</p>
+                        <small class="timestamp">📅 Uploaded: ${data.uploadedAt}</small>
+                    `;
+                    resultsDiv.appendChild(card);
+                });
+            } catch (error) {
+                searchBtn.innerHTML = "🔍 Search Orders";
+                searchBtn.disabled = false;
+                alert("Index Error: Click the link in the Inspect > Console to enable searching!");
+            }
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert("Order # copied!");
+        }
+    </script>
+</body>
+</html>
